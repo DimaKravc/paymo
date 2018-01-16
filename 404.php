@@ -19,16 +19,20 @@
     </div>
     <section class="primary">
         <div class="primary__inner">
-            <?php get_search_form(); ?>
-            <div class="page-status">
-                <div class="page-status__inner">
-                    <span class="page-status__code">404</span>
-                    <h1 class="page-status__message"><strong>Нет такой страницы</strong></h1>
-                    <h3><strong>Вернуться на <a href="<?php echo esc_url(home_url('/')) ?>">главную
-                                страницу.</a></strong></h3>
-                </div>
+            <div data-ajaxify="top-bar">
+                <?php get_search_form(); ?>
             </div>
-            <?php get_template_part('page', 'footer'); ?>
+            <div data-ajaxify="content" data-ajaxify-transition>
+                <div class="page-status">
+                    <div class="page-status__inner">
+                        <span class="page-status__code">404</span>
+                        <h1 class="page-status__message"><strong>Нет такой страницы</strong></h1>
+                        <h3><strong>Вернуться на <a href="<?php echo esc_url(home_url('/')) ?>">главную
+                                    страницу.</a></strong></h3>
+                    </div>
+                </div>
+                <?php get_template_part('page', 'footer'); ?>
+            </div>
         </div>
         <button class="sidebar-toggle" data-js="sidebar-toggle"></button>
     </section>

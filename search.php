@@ -23,11 +23,18 @@
                 <?php get_search_form(); ?>
             </div>
             <div data-ajaxify="content" data-ajaxify-transition>
-                <?php while (have_posts()) : the_post();
-                    echo '<main class="content">';
-                    get_template_part('content', 'page');
-                    echo '</main>';
-                endwhile; ?>
+                <div class="search-result">
+                <?php
+                 if (have_posts()) {
+                     while (have_posts()) : the_post();
+                         get_template_part('content', 'search');
+                     endwhile;
+                 } else {
+                     echo '<h2 class="search-result__not-found-caption">По вашему запросу ничего не найдено!</h2>';
+                     echo '<span>Попробуйте изменить поисковую фразу.</span>';
+                 }
+                ?>
+                </div>
                 <?php get_template_part('page', 'footer'); ?>
             </div>
         </div>

@@ -9,56 +9,22 @@ jQuery(document).ready(function ($) {
 
     Application.init({
         searchForm: function () {
-            var $form = $('.site-search');
-            var $input = $form.find('[data-js="search-field"]');
-            //var $resultBlock = $form.find('[data-js="search-result"]');
+            var $form = $('[data-js="site-search"]');
 
-            $input.on('focus blur', function () {
-                $(this).closest('.site-search')
-                    .toggleClass('--focus')
-            });
+            $form.on('input', 'input[type="text"]', function () {
+                var $field = $(this);
+                var keyword = $field.val();
 
-            $form.on('submit', function (e) {
-                e.preventDefault();
-
-                var $this = $(this),
-                    value = $(this).find('[data-js="search-field"]').val(),
-                    $resultBlock = $this.find('[data-js="search-result"]');
-
-                if (value.length >= 3) {
-                    $resultBlock.html('');
-                    queryPosts($this, {"s": value, "location": window.location.href})
+                if (keyword) {
+                    $.post(paymo_ajax_data.url, {
+                        action: 'preview_search',
+                        nonce_code: paymo_ajax_data.nonce,
+                        keyword: keyword
+                    }, function (response) {
+                        console.log(response)
+                    })
                 }
-
-                $(document).mouseup(function (e) {
-                    if (!$this.is(e.target) && !$this.has(e.target).length) {
-                        $this.removeClass('--searched');
-                        $resultBlock.html();
-                    }
-                })
-            });
-
-            var queryPosts = function ($form, str) {
-                $.ajax({
-                    url: search_ajax['url'] + '?action=search_action&ajax_nonce=' + search_ajax['nonce'],
-                    type: 'POST',
-                    data: str,
-                    beforeSend: function () {
-                        $form.addClass('--searching');
-                    },
-                    success: function (data) {
-                        $form.find('[data-js="search-result"]')
-                            .html(data)
-                            .ajaxify();
-                    },
-                    error: function (err) {
-                        console.warn(err)
-                    },
-                    complete: function () {
-                        $form.removeClass('--searching').addClass('--searched')
-                    }
-                })
-            }
+            })
         },
         sidebar: function () {
             var $sidebarToggle = $('[data-js="sidebar-toggle"]'),

@@ -74,10 +74,12 @@ if (!function_exists('theme_load_scripts')) :
         wp_enqueue_script('application', get_template_directory_uri() . '/js/application.js', array('jquery'), DOCUMENTATION_VERSION, true);
         wp_enqueue_script('main', get_template_directory_uri() . '/js/main.js', array('application'), DOCUMENTATION_VERSION, true);
 
-        wp_localize_script('main', 'search_ajax', array(
-            'url' => admin_url('admin-ajax.php'),
-            'nonce' => wp_create_nonce('nonce'),
-        ));
+        wp_localize_script('application', 'paymo_ajax_data',
+            array(
+                'url' => admin_url('admin-ajax.php'),
+                'nonce' => wp_create_nonce('ajax-data-nonce')
+            )
+        );
 
         /**
          * Add noscript tag
@@ -339,7 +341,6 @@ if (!function_exists('save_custom_meta_box')) :
             return $post_id;
 
         $slug = "page";
-        echo $post->post_type;
         if ($slug != $post->post_type)
             return $post_id;
 
@@ -353,47 +354,37 @@ if (!function_exists('save_custom_meta_box')) :
 endif;
 add_action("save_post", "save_custom_meta_box", 10, 3);
 
-if (!function_exists('search_action_callback')):
+if (!function_exists('preview_search_results')) :
     /**
-     * Add ajax search
+     * Preview Search Results
      */
-    function search_action_callback()
+    function preview_search_results()
     {
-        check_ajax_referer('nonce', 'ajax_nonce');
+        if (!wp_verify_nonce($_POST['nonce_code'], 'ajax-data-nonce')) die('Stop!');
 
-        $string = $_POST['s'];
-        $fromURL = $_POST['location'];
+        $keyword = $_REQUEST['keyword'];
 
-        $query = new WP_Query(array(
-            'posts_per_page' => 9,
-            'post_type' => 'page',
-            's' => $string
-        ));
+        if ($keyword) {
+            $query = new WP_Query(array(
+                's'              => 'paymo',
+                'post_type'      => 'page'
+            ));
 
-        $result = '';
-
-        if ($query->posts) {
-            foreach ($query->posts as $post) {
-                $toURL = get_permalink($post->ID);
-
-                if ($fromURL == $toURL) {
-                    $result .= '<dl class="search-result__item"><dt>' . $post->post_title . '</dt><dd>' . wp_strip_all_tags(substr($post->post_content, 0, 120)) . '<small class="search-result__current">Текущая страница</small></dd></dl>';
-                } else {
-                    $result .= '<a href="' . $toURL . '">';
-                    $result .= '<dl class="search-result__item"><dt>' . $post->post_title . '</dt><dd>' . wp_strip_all_tags(substr($post->post_content, 0, 120)) . '</dd></dl>';
-                    $result .= '</a>';
-                }
+            //relevanssi_do_query($query);
+            if (function_exists("relevanssi_do_querys")) {
+                echo 'true';
+            } else {
+                echo 'false';
             }
-            echo $result;
-        } else {
-            echo '<div class="search-result__not-found">Ничего не найдено</div>';
+            //wp_send_json($query->posts['0']);
         }
 
         wp_die();
     }
 endif;
-add_action('wp_ajax_nopriv_search_action', 'search_action_callback');
-add_action('wp_ajax_search_action', 'search_action_callback');
+
+add_action('wp_ajax_nopriv_preview_search', 'preview_search_results');
+add_action('wp_ajax_preview_search', 'preview_search_results');
 
 /**
  * Include files

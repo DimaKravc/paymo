@@ -27,6 +27,7 @@
  * 15. Scroll to top toggle styles
  * 16. Progress bar styles
  * 17. Page status styles
+ * 18. Search result styles
  */
 
 /* =====================================================
@@ -833,16 +834,6 @@ ol li:after {
   background-image: url(data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8IS0tIEdlbmVyYXRvcjogQWRvYmUgSWxsdXN0cmF0b3IgMTkuMC4wLCBTVkcgRXhwb3J0IFBsdWctSW4gLiBTVkcgVmVyc2lvbjogNi4wMCBCdWlsZCAwKSAgLS0+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0iQ2FwYV8xIiB4PSIwcHgiIHk9IjBweCIgdmlld0JveD0iMCAwIDUyLjk2NiA1Mi45NjYiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDUyLjk2NiA1Mi45NjY7IiB4bWw6c3BhY2U9InByZXNlcnZlIiB3aWR0aD0iMTZweCIgaGVpZ2h0PSIxNnB4Ij4KPHBhdGggZD0iTTUxLjcwNCw1MS4yNzNMMzYuODQ1LDM1LjgyYzMuNzktMy44MDEsNi4xMzgtOS4wNDEsNi4xMzgtMTQuODJjMC0xMS41OC05LjQyLTIxLTIxLTIxcy0yMSw5LjQyLTIxLDIxczkuNDIsMjEsMjEsMjEgIGM1LjA4MywwLDkuNzQ4LTEuODE3LDEzLjM4NC00LjgzMmwxNC44OTUsMTUuNDkxYzAuMTk2LDAuMjA1LDAuNDU4LDAuMzA3LDAuNzIxLDAuMzA3YzAuMjUsMCwwLjQ5OS0wLjA5MywwLjY5My0wLjI3OSAgQzUyLjA3NCw1Mi4zMDQsNTIuMDg2LDUxLjY3MSw1MS43MDQsNTEuMjczeiBNMjEuOTgzLDQwYy0xMC40NzcsMC0xOS04LjUyMy0xOS0xOXM4LjUyMy0xOSwxOS0xOXMxOSw4LjUyMywxOSwxOSAgUzMyLjQ1OSw0MCwyMS45ODMsNDB6IiBmaWxsPSIjMTQ5ZGI0Ii8+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+Cjwvc3ZnPgo=);
 }
 
-.site-search.--searching .search-result {
-  opacity: 1;
-  visibility: visible;
-}
-
-.site-search.--searching .loader {
-  opacity: 1;
-  visibility: visible;
-}
-
 .site-search.--searched .search-result {
   opacity: 1;
   visibility: visible;
@@ -973,62 +964,6 @@ ol li:after {
 .site-search .search-result__not-found {
   text-align: center;
   padding: 6px;
-}
-
-.site-search .loader {
-  display: block;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: auto;
-  opacity: 0;
-  visibility: hidden;
-  transition: animation 0.3s cubic-bezier(0.5, 0.2, 0.5, 1);
-  z-index: 0;
-  width: 25px;
-  height: 25px;
-  pointer-events: none;
-}
-
-.site-search .loader:before,
-.site-search .loader:after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  border-radius: 50%;
-  opacity: 0;
-  background: #00acc1;
-}
-
-.site-search .loader:before {
-  z-index: 2;
-  animation: preloader 1.4s infinite ease-in;
-}
-
-.site-search .loader:after {
-  z-index: 1;
-  animation: preloader 1.4s infinite 0.7s ease-out;
-}
-
-@keyframes preloader {
-  0% {
-    opacity: 0;
-    transform: scale(0);
-  }
-
-  50% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0;
-    transform: scale(1);
-  }
 }
 
 /* =====================================================
@@ -1201,6 +1136,39 @@ ol li:after {
 
 .page-status__message {
   text-transform: uppercase;
+}
+
+/* =====================================================
+   18. Search result styles
+   ===================================================== */
+
+.admin-bar .search-result {
+  min-height: calc(100vh - 268px);
+}
+
+.search-result {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  min-height: calc(100vh - 196px);
+}
+
+.search-result:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.search-result__item {
+  margin-bottom: 20px;
+}
+
+.search-result__item:not(:last-child) {
+  padding-bottom: 20px;
+  border-bottom: 1px dotted #AAAAAA;
+}
+
+.search-result__not-found-caption {
+  margin-bottom: 10px;
 }
 
 @media (min-width: 768px) {
