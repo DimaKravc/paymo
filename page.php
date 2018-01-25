@@ -28,7 +28,7 @@
         <div class="primary__inner">
             <div data-ajaxify="top-bar">
                 <?php get_search_form(); ?>
-                <?php breadcrumbs(); ?>
+                <?php //breadcrumbs(); ?>
             </div>
             <div data-ajaxify="content" data-ajaxify-transition>
                 <?php while (have_posts()) : the_post();

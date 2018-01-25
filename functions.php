@@ -354,6 +354,66 @@ if (!function_exists('save_custom_meta_box')) :
 endif;
 add_action("save_post", "save_custom_meta_box", 10, 3);
 
+if (!function_exists('section_nav_render')):
+    function section_nav_render ($attributes, $content = null) {
+        $before = '<ul class="section-nav-list">';
+        $after = '</ul>';
+
+        return do_shortcode($before . $content . $after);
+    }
+endif;
+add_shortcode('section-nav', 'section_nav_render');
+
+if (!function_exists('section_nav_item_render')):
+    function section_nav_item_render ($attributes, $content = null) {
+        $res = '<li class="section-nav-list__item">';
+        $res .= '<a class="section-nav-list__link" href="'. $attributes['href'] .'"><span class="i-'. $attributes['icon'] .'"></span>'. $attributes['text'] .'</a>';
+        $res .= '</li>';
+
+        return $res;
+    }
+endif;
+add_shortcode('section-nav-item', 'section_nav_item_render');
+
+if (!function_exists('showcases_render')):
+    function showcases_render ($attributes, $content = null) {
+        $before = '<ul class="showcases-list">';
+        $after = '</ul>';
+
+        return do_shortcode($before . $content . $after);
+    }
+endif;
+add_shortcode('showcases', 'showcases_render');
+
+if (!function_exists('showcases_item_render')):
+    function showcases_item_render ($attributes, $content = null) {
+        $res = '<li class="showcases-list__item">';
+        $res .= '<a class="showcases-list__link" href="'. $attributes['href'] .'"><span class="i-code-snippet"></span>'. $attributes['text'] .'</a>';
+        $res .= '</li>';
+
+        return $res;
+    }
+endif;
+add_shortcode('showcases-item', 'showcases_item_render');
+
+if (!function_exists('attention_render')):
+    function attention_render ($attributes) {
+        $res = '<p class="attention">';
+        $res .= $attributes['text'];
+        $res .= '</p>';
+
+        return $res;
+    }
+endif;
+add_shortcode('attention', 'attention_render');
+
+if (!function_exists('button_render')):
+    function button_render ($attributes) {
+        return '<span class="btn-imitation">'. $attributes['text'] .'</span>';
+    }
+endif;
+add_shortcode('button', 'button_render');
+
 if (!function_exists('preview_search_results')) :
     /**
      * Preview Search Results
