@@ -451,3 +451,5 @@ add_action('wp_ajax_preview_search', 'preview_search_results');
  */
 require get_template_directory() . '/inc/tgm/tgm-plugin-registration.php';
 require get_template_directory() . '/inc/menu-walker/menu-walker.php';
+require get_template_directory() . '/inc/shortcodes/payment-frame.php';
+require get_template_directory() . '/inc/shortcodes/demo-cards.php';

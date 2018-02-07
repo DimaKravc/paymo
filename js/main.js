@@ -38,11 +38,10 @@ var Application = new function () {
      * @method
      */
 
-    this.init = function (widgets) {
-        if (widgets) {
-            jQuery.each(widgets, function (key, value) {
-                value.call(app);
-                app.widgets[key] = value;
+    this.init = function(widgets) {
+        if(widgets) {
+            jQuery.each(widgets, function(key, value){
+                app.widgets[key] = value.call(app);
             });
         }
     }
