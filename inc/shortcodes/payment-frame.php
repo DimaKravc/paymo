@@ -9,20 +9,26 @@ if (!function_exists('payment_frame_render')):
                     $res .= '<li class="payment-frame__tabs__item"><a href="#" data-target="#inbuilt-frame"><span class="i-inbuilt-frame"></span>Встроенный<br>фрейм</a></li>';
                 $res .= '</ul>';
 
-                $res .= '<div data-id="#popup-frame">';
+                $res .= '<form class="form" data-id="#popup-frame" data-frame="form" method="post">';
                     $res .= '<div class="payment-frame__content">';
-                        $res .= '<form class="form payment-frame__content__col" data-frame="form">';
+                        $res .= '<div class="payment-frame__content__col">';
                             $res .= '<div class="form__field">';
                                 $res .= '<label for="api_key">API KEY:</label>';
-                                if (isset($attributes['api_key'])):
-                                    $res .= '<input type="text" name="api_key" id="api_key" value="'. esc_attr($attributes['api_key']) .'" autocomplete="off" />';
-                                else:
-                                    $res .= '<input type="text" name="api_key" id="api_key" value="'. esc_attr('e5ebc0d4-f90b-409b-874c-c729987001da') .'" autocomplete="off" />';
-                                endif;
+                                $res .= '<div class="form__field__inner">';
+                                    if (isset($attributes['api_key'])):
+                                        $res .= '<input type="text" name="api_key" id="api_key" value="'. esc_attr($attributes['api_key']) .'" autocomplete="off" data-required="true" onkeypress="return /[-\w\d]/.test(event.key)" />';
+                                    else:
+                                        $res .= '<input type="text" name="api_key" id="api_key" value="'. esc_attr('e5ebc0d4-f90b-409b-874c-c729987001da') .'" autocomplete="off" data-required="true" onkeypress="return /[-\w\d]/.test(event.key)" />';
+                                    endif;
+                                    $res .= '<p class="error-message" data-js="error-tooltip">Поле не соответсвует шаблону.</p>';
+                                $res .= '</div>';
                             $res .= '</div>';
                             $res .= '<div class="form__field">';
                                 $res .= '<label for="tx_id">ID Транзакции:</label>';
-                                $res .= '<input type="text" name="tx_id" id="tx_id" value="" autocomplete="off" />';
+                                $res .= '<div class="form__field__inner">';
+                                    $res .= '<input type="text" name="tx_id" id="tx_id" value="" autocomplete="off" data-required="true" onkeypress="return /[\w\d]/.test(event.key)" />';
+                                    $res .= '<p class="error-message" data-js="error-tooltip">Поле не может быть пустым.</p>';
+                                $res .= '</div>';
                             $res .= '</div>';
                             $res .= '<div class="form__field">';
                                 $res .= '<label for="description">Описание платежа:</label>';
@@ -34,11 +40,14 @@ if (!function_exists('payment_frame_render')):
                             $res .= '</div>';
                             $res .= '<div class="form__field">';
                                 $res .= '<label for="amount">Сумма:</label>';
-                                if (isset($attributes['amount'])):
-                                    $res .= '<input type="text" name="amount" id="amount" value="'. esc_attr($attributes['amount']) .'" autocomplete="off" />';
-                                else:
-                                    $res .= '<input type="text" name="amount" id="amount" value="'. esc_attr(1000) .'" autocomplete="off" />';
-                                endif;
+                                $res .= '<div class="form__field__inner">';
+                                    if (isset($attributes['amount'])):
+                                        $res .= '<input type="text" name="amount" id="amount" value="'. esc_attr($attributes['amount']) .'" autocomplete="off" data-required="true" onkeypress="return /[\d]/.test(event.key)" />';
+                                    else:
+                                        $res .= '<input type="text" name="amount" id="amount" value="'. esc_attr(1000) .'" autocomplete="off" data-required="true" onkeypress="return /[\d]/.test(event.key)" />';
+                                    endif;
+                                    $res .= '<p class="error-message" data-js="error-tooltip">Поле не может быть пустым.</p>';
+                                $res .= '</div>';
                             $res .= '</div>';
                             $res .= '<div class="form__field">';
                                 $res .= '<label for="success_redirect">Переход на URL в случае успешного платежа:</label>';
@@ -64,7 +73,7 @@ if (!function_exists('payment_frame_render')):
                                     $res .= '<input type="text" name="signature" id="signature" placeholder="" />';
                                 endif;
                             $res .= '</div>';
-                        $res .= '</form>';
+                        $res .= '</div>';
 
                         $res .= '<div class="payment-frame__content__col code-snippet--wrap">';
                             $res .= '<div class="code-snippet">';
@@ -74,12 +83,13 @@ if (!function_exists('payment_frame_render')):
                         $res .= '</div>';
                     $res .= '</div>';
                     $res .= '<div class="payment-frame__controls">';
-                        $res .= '<button data-frame="control" class="button">Вызвать фрейм</button>';
+                        $res .= '<button type="submit" data-frame="control" class="button">Вызвать фрейм</button>';
                     $res .= '</div>';
-                $res .= '</div>';
+                $res .= '</form>';
 
-                $res .= '<div class="payment-frame__content" data-id="#inbuilt-frame" style="margin-bottom: 0">';
-                    $res .= '<div id="iframe-target" style="margin: 15px auto 0;"></div>';
+                $res .= '<div class="payment-frame__content payment-frame__inbuilt" data-id="#inbuilt-frame" style="display: none;">';
+                    $res .= '<div id="iframe-target" class="payment-frame__inbuilt__area"></div>';
+                    $res .= '<div class="preloader--wrap" data-frame="preloader"><svg class="preloader" viewBox="0 0 500 500"><circle cx="250" cy="250" r="100" class="preloader__spinner-track" /><circle cx="250" cy="250" r="100" class="preloader__spinner" ></circle></svg></div>';
                 $res .= '</div>';
             $res .= '</div>';
         $res .= '</div>';

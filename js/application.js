@@ -152,14 +152,7 @@ jQuery(document).ready(function ($) {
         },
         frameInit: function () {
             var module = {};
-
-            function generateTransactionId() {
-                function s4() {
-                    return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1)
-                }
-
-                return s4() + s4()
-            }
+            var submitted = false;
 
             module.data = {
                 api_key: null,
@@ -179,8 +172,30 @@ jQuery(document).ready(function ($) {
                 });
             };
 
+            module.formValidation = function () {
+                var $inputs = module.$form.find('input[data-required="true"]');
+                var valid = true;
+                var localValid;
+
+                $inputs.map(function (currentValue, input) {
+                    if (input.name === 'api_key') {
+                        localValid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(input.value);
+                        localValid ? $(input).removeClass('error') : $(input).addClass('error');
+                        valid && (valid = localValid);
+                    } else {
+                        localValid = input.value.length;
+
+                        localValid ? $(input).removeClass('error') : $(input).addClass('error');
+                        valid && (valid = localValid);
+                        input.setCustomValidity('Поле не может быть пустым');
+                    }
+                });
+
+                return valid;
+            };
+
             module.getCodeSnippet = function () {
-                var template = '&lt;script src="https://paymo.ru/paymentgate/\n' +
+                return '&lt;script src="https://paymo.ru/paymentgate/\n' +
                     'iframe/checkout.js"&gt;&lt;/script&gt;\n' +
                     '&lt;script&gt;\n' +
                     '    PaymoFrame.set({\n' +
@@ -200,14 +215,15 @@ jQuery(document).ready(function ($) {
                     '\n' +
                     '&lt;div id="iframe_parent"&gt;\n' +
                     '&lt;/div&gt;';
-
-                return template;
             };
 
             module.init = function () {
                 module.$form = $('[data-frame="form"]');
                 module.$snippet = $('[data-frame="snippet"]');
                 module.$control = $('[data-frame="control"]');
+                module.$tabs = $('[data-target]');
+                module.$entries = $('[data-id]');
+                module.$preloader = $('[data-frame="preloader"]');
 
                 module.$form.find('input[name="tx_id"]').val(generateTransactionId());
 
@@ -215,13 +231,18 @@ jQuery(document).ready(function ($) {
                 module.$snippet.html(module.getCodeSnippet());
 
                 var $inputs = module.$form.find('input');
-                $inputs.on('keyup', function () {
+                $inputs.on('keyup', function (event) {
                     module.updateData();
                     module.$snippet.html(module.getCodeSnippet());
+                    submitted && event.target.dataset.required && module.formValidation();
                 });
 
                 module.$control.on('click', function (e) {
                     e.preventDefault();
+
+                    submitted = true;
+
+                    if (!module.formValidation()) return;
 
                     PaymoFrame && PaymoFrame.open({
                         api_key: module.data.api_key,
@@ -237,26 +258,61 @@ jQuery(document).ready(function ($) {
                     });
                 });
 
-                var $tabs = $('[data-target]');
+                module.$entries.each(function (index, item) {
+                    if (!$('[data-target="' + this.dataset.id + '"]').hasClass('active')) {
+                        $(item).hide();
+                    }
+                });
 
-                $tabs.on('change.tabs', function (event) {
-                   if (event.target.dataset.target === '#inbuilt-frame') {
-                       PaymoFrame && PaymoFrame.set({
-                           parent_id: "iframe-target",
-                           api_key: module.data.api_key,
-                           tx_id: module.data.tx_id,
-                           description: module.data.description,
-                           amount: module.data.amount * 100,
-                           signature: module.data.signature,
-                           success_redirect: module.data.success_redirect,
-                           fail_redirect: module.data.fail_redirect,
-                           rebill: {},
-                           extra: {},
-                           version: "2.0.0"
-                       });
-                   }
+                module.$tabs.on('click', function (event) {
+                    event.preventDefault();
+
+                    var $this = $(this);
+
+                    if (!$this.hasClass('active')) {
+                        if (event.target.dataset.target === '#inbuilt-frame') {
+                            if (!module.formValidation()) return;
+
+                            PaymoFrame && PaymoFrame.set({
+                                parent_id: "iframe-target",
+                                api_key: module.data.api_key,
+                                tx_id: module.data.tx_id,
+                                description: module.data.description,
+                                amount: module.data.amount * 100,
+                                signature: module.data.signature,
+                                success_redirect: module.data.success_redirect,
+                                fail_redirect: module.data.fail_redirect,
+                                rebill: {},
+                                extra: {},
+                                version: "2.0.0"
+                            });
+
+                            setTimeout(function () {
+                                module.$preloader.fadeOut(350);
+                            }, 1500);
+                        } else {
+                            module.$preloader.show();
+                            $('#iframe-target').html('');
+                        }
+
+                        // Tab classes update
+                        module.$tabs.removeClass('active');
+                        $this.addClass('active');
+
+                        // Entry update
+                        module.$entries.hide();
+                        $('[data-id="' + this.dataset.target + '"]').show(0);
+                    }
                 });
             };
+
+            function generateTransactionId() {
+                function s4() {
+                    return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1)
+                }
+
+                return s4() + s4()
+            }
 
             return module.init
         },
@@ -265,34 +321,6 @@ jQuery(document).ready(function ($) {
 
             $els.focus(function () {
                 $(this).select();
-            });
-        },
-        tabsInit: function () {
-            var $tabs = $('[data-target]');
-            var $entries = $('[data-id]');
-            var tabEvent = new Event('change.tabs');
-
-            $entries.each(function (index, item) {
-                if (!$('[data-target="' + this.dataset.id + '"]').hasClass('active')) {
-                    $(item).hide();
-                }
-            });
-
-            $tabs.on('click', function (event) {
-                event.preventDefault();
-                var $this = $(this);
-
-                if (!$this.hasClass('active')) {
-                    $this.trigger('change.tabs');
-
-                    // Tab classes update
-                    $tabs.removeClass('active');
-
-                    $this.addClass('active');
-                    // Entry update
-                    $entries.hide();
-                    $('[data-id="' + this.dataset.target + '"]').show(0);
-                }
             });
         }
     })
